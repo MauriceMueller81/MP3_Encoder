@@ -5,11 +5,17 @@
  *      Author: maurice
  */
 
-
+#ifdef WINDOWS
+#include <windows.h>
+#endif
 #include "CApplinput.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <iostream>
+#include <iterator>
+#include <dirent.h>
+#include <algorithm>
+
 
 using namespace std;
 
@@ -17,16 +23,21 @@ CApplinput::CApplinput(int argc, char* argv[]) :
         argc_(argc),
         argv_(argv) {
     appName_ = argv_[0];
+    InputFolderName = "";
+    uiNumberOfFilesInFolder = 0;
+    // set verbosity level to 2
+    // ToDO read verbosity level from user input v
+    optv = 2;
     this->parse();
 }
 
 CApplinput::~CApplinput() {
 }
 
-std::string CApplinput::getAppName() const {
+string CApplinput::getAppName() const {
     return appName_;
 }
-std::string CApplinput::getInputFolderName() const {
+string CApplinput::getInputFolderName() const {
     return InputFolderName;
 }
 void CApplinput::parse() {
@@ -58,7 +69,7 @@ void CApplinput::parse() {
         }
     }
 }
-unsigned int CApplinput::checkUserInputfolder(const std::string pathname)
+unsigned int CApplinput::checkUserInputfolder(const string pathname)
 {
 	unsigned int num = 0;
 	struct stat info;
@@ -70,15 +81,44 @@ unsigned int CApplinput::checkUserInputfolder(const std::string pathname)
 			printf( "%s is a directory\n", pathname.c_str() );
 			// save the folder name
 			setFolderName(pathname);
-			num =1;
 		}
 	else
 	    printf( "%s is no directory\n", pathname.c_str() );
 
 	// parse the folder
-
+	num = getFilesInDirectory(pathname, FilesInFolder);
+    copy(FilesInFolder.begin(), FilesInFolder.end(),ostream_iterator<string>(cout, "\n"));
 	return num;
 }
+/* Returns a list of files in a directory (except the ones that begin with a dot) */
+
+int CApplinput::getFilesInDirectory(const string &directory, vector<string> &out)
+{
+	int ret = 0;
+#ifdef WINDOWS
+    std::string pattern(directory);
+    pattern.append("\\*");
+    WIN32_FIND_DATA data;
+    HANDLE hFind;
+    if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE) {
+        do {
+        	out.push_back(data.cFileName);
+        } while (FindNextFile(hFind, &data) != 0);
+        FindClose(hFind);
+    }
+#else
+	DIR* dirp = opendir(directory.c_str());
+	    struct dirent * dp;
+	    while ((dp = readdir(dirp)) != NULL) {
+	    	ret++;
+	    	out.push_back(dp->d_name);
+	    	if(optv > 1)
+	    		printf("current file: %s\n", dp->d_name);
+	    }
+	    closedir(dirp);
+#endif
+	    return ret;
+} // GetFilesInDirectory
 
 void CApplinput::setFolderName(const std::string name )
 {
