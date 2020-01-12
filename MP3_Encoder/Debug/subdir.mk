@@ -5,14 +5,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../CApplinput.cpp \
+../CInputWaveFile.cpp \
 ../MP3Encoder.cpp 
 
 OBJS += \
 ./CApplinput.o \
+./CInputWaveFile.o \
 ./MP3Encoder.o 
 
 CPP_DEPS += \
 ./CApplinput.d \
+./CInputWaveFile.d \
 ./MP3Encoder.d 
 
 

@@ -24,16 +24,19 @@ public:
     string getInputFolderName() const;
     unsigned int checkUserInputfolder(const std::string pathname);
 
+    unsigned int getNumOfFilesInFolder() const;
     bool hasKey(const string&) const;
     Option* getParamFromKey(const string&) const;
     void printOptions() const;
 
     int optv;
 private:
-    typedef std::map<std::string, std::string> Options;
+    typedef map<string, string> Options;
     void parse();
-    void setFolderName(const std::string name);
-    int getFilesInDirectory(const string &directory, vector<string> &out);
+    void setFolderName(const string name);
+    void setNumOfFilesInFolder (const unsigned int number);
+    bool checkFileIfWaveFile(const string fn);
+    int getWaveFilesInDirectory(const string &directory, vector<string> &out);
     const char* const *begin() const;
     const char* const *end() const;
     const char* const *last() const;

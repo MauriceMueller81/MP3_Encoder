@@ -40,6 +40,9 @@ string CApplinput::getAppName() const {
 string CApplinput::getInputFolderName() const {
     return InputFolderName;
 }
+unsigned int CApplinput::getNumOfFilesInFolder() const { // @suppress("Member declaration not found")
+	return uiNumberOfFilesInFolder;
+}
 void CApplinput::parse() {
     typedef pair<string, string> Option;
     Option* option = new pair<string, string>();
@@ -86,20 +89,23 @@ unsigned int CApplinput::checkUserInputfolder(const string pathname)
 	    printf( "%s is no directory\n", pathname.c_str() );
 
 	// parse the folder
-	num = getFilesInDirectory(pathname, FilesInFolder);
+	num = getWaveFilesInDirectory(pathname, FilesInFolder);
     copy(FilesInFolder.begin(), FilesInFolder.end(),ostream_iterator<string>(cout, "\n"));
+    this->setNumOfFilesInFolder(num);
 	return num;
 }
 /* Returns a list of files in a directory (except the ones that begin with a dot) */
 
-int CApplinput::getFilesInDirectory(const string &directory, vector<string> &out)
+int CApplinput::getWaveFilesInDirectory(const string &directory, vector<string> &out)
 {
 	int ret = 0;
+	string tmpstr;
 #ifdef WINDOWS
     std::string pattern(directory);
     pattern.append("\\*");
     WIN32_FIND_DATA data;
     HANDLE hFind;
+    // ToDO add check for .wav extension
     if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE) {
         do {
         	out.push_back(data.cFileName);
@@ -110,19 +116,34 @@ int CApplinput::getFilesInDirectory(const string &directory, vector<string> &out
 	DIR* dirp = opendir(directory.c_str());
 	    struct dirent * dp;
 	    while ((dp = readdir(dirp)) != NULL) {
-	    	ret++;
-	    	out.push_back(dp->d_name);
-	    	if(optv > 1)
-	    		printf("current file: %s\n", dp->d_name);
+	    	tmpstr= dp->d_name;
+	    	if(checkFileIfWaveFile(tmpstr))
+	    	{
+	    		ret++;
+	    		out.push_back(dp->d_name);
+	    		if(optv > 1)
+	    			printf("current file: %s\n", dp->d_name);
+	    	}
 	    }
 	    closedir(dirp);
 #endif
 	    return ret;
-} // GetFilesInDirectory
+}
+// GetFilesInDirectory
+bool CApplinput::checkFileIfWaveFile(const string fn)
+{
+	bool bWaveFlag = false;
+	  if(fn.substr(fn.find_last_of(".") + 1) == "wav")
+		  bWaveFlag =true;
 
+	return bWaveFlag;
+}
 void CApplinput::setFolderName(const std::string name )
 {
 	InputFolderName = name;
+}
+void CApplinput::setNumOfFilesInFolder(const unsigned int number){
+	uiNumberOfFilesInFolder = number;
 }
 void CApplinput::printOptions() const {
     std::map<std::string, std::string>::const_iterator m = options_.begin();
