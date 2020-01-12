@@ -94,6 +94,11 @@ unsigned int CApplinput::checkUserInputfolder(const string pathname)
     this->setNumOfFilesInFolder(num);
 	return num;
 }
+
+string CApplinput::returnWaveFileNameFromIndex( const unsigned int index)
+{
+	return FilesInFolder[index];
+}
 /* Returns a list of files in a directory (except the ones that begin with a dot) */
 
 int CApplinput::getWaveFilesInDirectory(const string &directory, vector<string> &out)

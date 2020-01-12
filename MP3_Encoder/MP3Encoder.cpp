@@ -4,6 +4,7 @@
 #include </usr/local/include/lame/lame.h>
 #include "encoderdef.h"
 #include "CApplinput.h"
+#include "CInputWaveFile.h"
 
 using namespace std;
 
@@ -11,18 +12,24 @@ int main(int argc, char **argv) {
 
 	CApplinput input(argc, argv);
 	CApplinput::Option* opt = input.getParamFromKey("-p");
-	printf("application %s started\n", input.getAppName().c_str());
+	printf("application %s version %d started\n", input.getAppName().c_str(), version);
 	const string folderpath = opt ? (*opt).second : "";
-	cout << folderpath << endl;
 	/* user input folder check code */
 	printf("user input folder path is: %s\n", folderpath.c_str());
+	if(input.optv > 1)
+		printf("checking input folder path if containing .wav files\n");
 	if(input.checkUserInputfolder(folderpath) < 1)
 	{
 		//exit
 		return -1;
 	}
 
-	//input.getNumOfFilesInFolder();
+	// for every .wav file in the input folder a decoder will be set up
+	for (unsigned int var = 0; var < input.getNumOfFilesInFolder(); ++var)
+	{
+		// read out the .wav file name
+		CInputWaveFile wave(input.returnWaveFileNameFromIndex(var));
+	};
 
 	// init lame library
 	lame_t psLame;

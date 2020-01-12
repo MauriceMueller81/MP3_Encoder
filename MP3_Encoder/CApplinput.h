@@ -28,6 +28,7 @@ public:
     bool hasKey(const string&) const;
     Option* getParamFromKey(const string&) const;
     void printOptions() const;
+    string returnWaveFileNameFromIndex( const unsigned int index);
 
     int optv;
 private:
