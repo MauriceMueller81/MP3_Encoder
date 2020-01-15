@@ -28,7 +28,8 @@ int main(int argc, char **argv) {
 	for (unsigned int var = 0; var < input.getNumOfFilesInFolder(); ++var)
 	{
 		// read out the .wav file name
-		CInputWaveFile wave(input.returnWaveFileNameFromIndex(var));
+		//string filepath = folderpath + "/" + input.returnWaveFileNameFromIndex(var);
+		CInputWaveFile wave(folderpath + "/" + input.returnWaveFileNameFromIndex(var));
 	};
 
 	// init lame library
