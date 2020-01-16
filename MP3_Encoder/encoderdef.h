@@ -12,7 +12,7 @@
 
 	const unsigned int version = 0.1;
     const int PCM_SIZE = 8192;
-    const int MP3_SIZE = 8192*2;
+    const int MP3_SIZE = 8192;
 
 
 

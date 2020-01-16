@@ -16,12 +16,16 @@ using namespace std;
 CInputWaveFile::CInputWaveFile() {
 	extra_param_length_ = 0;
 }
-CInputWaveFile::CInputWaveFile( const string & filename )
+
+CInputWaveFile::CInputWaveFile( const string & PathToFilename )
 {
     fmt.wFormatTag      = 0;
     extra_param_length_ = 0;
     fact.samplesNumber  = -1;
-    const char* wavefilename = filename.c_str();
+
+    setFilename(PathToFilename);
+
+    const char* wavefilename = PathToFilename.c_str();
 
     if(optv >1)
     	printf("extracting wave header information of file %s\n", wavefilename);
@@ -29,7 +33,7 @@ CInputWaveFile::CInputWaveFile( const string & filename )
     // try alternative waveheader
     //WavReader(wavefilename, "test.wav");
 
-    std::ifstream file( filename.c_str(), std::ios_base::binary | std::ios_base::in );
+    std::ifstream file( PathToFilename.c_str(), std::ios_base::binary | std::ios_base::in );
     //file.open( filename.c_str()/*wavefilename*/, std::ios_base::binary | std::ios_base::in );
 
     if( file.is_open() == false )
@@ -83,6 +87,15 @@ CInputWaveFile::CInputWaveFile( const string & filename )
 
     file.read( & wave_[0], data.dataSIZE );
 }
+string CInputWaveFile::getWaveFileName()
+{
+	return filename;
+}
+void CInputWaveFile::setFilename(const string &path)
+{
+	filename = path.substr(path.find_last_of("/") +1 );
+}
+
 void CInputWaveFile::WavReader (const char* fileName, const char* fileToSave)
 {
     FILE *fin = fopen(fileName, "rb");

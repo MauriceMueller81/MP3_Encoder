@@ -28,7 +28,7 @@ public:
     int32_t get_avg_bytes_per_sec() const;
     int32_t get_data_size() const;
 
-
+    string getWaveFileName();
     // alternative wave header implementation
     void WavReader (const char* fileName, const char* fileToSave);
     //Chunks
@@ -99,10 +99,9 @@ public:
     static const int optv = 2;
 
 private:
+    void setFilename(const string &path);
 
-   // int optv;
-    std::vector<char>   wave_;
-
+    vector<char>   wave_;
     RIFF        riff;
     FMTHDR      fmthdr;
     FMT         fmt;
@@ -110,8 +109,8 @@ private:
     FACT        fact;
     DATA        data;
     int16_t     extra_param_length_;
-    std::vector<char>   extra_param_;
-
+    vector<char>   extra_param_;
+    string filename;
 };
 
 } /* namespace std */
