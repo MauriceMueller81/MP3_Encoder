@@ -11,8 +11,6 @@
 #include <fstream>          // std::ofstream
 #include <stdio.h>
 
-
-//namespace std {
 using namespace std;
 
 CInputWaveFile::CInputWaveFile() {
@@ -27,7 +25,6 @@ CInputWaveFile::CInputWaveFile( const string & filename )
 
     if(optv >1)
     	printf("extracting wave header information of file %s\n", wavefilename);
-
 
     // try alternative waveheader
     //WavReader(wavefilename, "test.wav");
@@ -148,6 +145,34 @@ void CInputWaveFile::WavReader (const char* fileName, const char* fileToSave)
     }
     fclose(fin);
     fclose(fout);
+}
+void CInputWaveFile::get_samples( unsigned int offset, unsigned int size, std::vector<char> & samples ) const
+{
+    if( offset > ( unsigned )data.dataSIZE )
+        return;
+
+    unsigned int real_size = ( offset + size ) < ( unsigned )data.dataSIZE ? size : ( unsigned )data.dataSIZE - offset;
+
+    samples.insert( samples.end(), & wave_[offset], & wave_[offset + real_size] );
+}
+int16_t CInputWaveFile::get_channels() const
+{
+    return fmt.nChannels;
+}
+
+int32_t CInputWaveFile::get_samples_per_sec() const
+{
+    return fmt.nSamplesPerSec;
+}
+
+int32_t CInputWaveFile::get_avg_bytes_per_sec() const
+{
+    return fmt.nAvgBytesPerSec;
+}
+
+int32_t CInputWaveFile::get_data_size() const
+{
+    return data.dataSIZE;
 }
 
 CInputWaveFile::~CInputWaveFile() {

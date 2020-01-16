@@ -6,16 +6,22 @@
 CPP_SRCS += \
 ../CApplinput.cpp \
 ../CInputWaveFile.cpp \
+../CLameEncoder.cpp \
+../COutputEncodedFile.cpp \
 ../MP3Encoder.cpp 
 
 OBJS += \
 ./CApplinput.o \
 ./CInputWaveFile.o \
+./CLameEncoder.o \
+./COutputEncodedFile.o \
 ./MP3Encoder.o 
 
 CPP_DEPS += \
 ./CApplinput.d \
 ./CInputWaveFile.d \
+./CLameEncoder.d \
+./COutputEncodedFile.d \
 ./MP3Encoder.d 
 
 

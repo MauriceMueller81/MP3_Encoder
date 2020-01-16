@@ -33,7 +33,7 @@ public:
     int optv;
 private:
     typedef map<string, string> Options;
-    void parse();
+    void parseInputParameter();
     void setFolderName(const string name);
     void setNumOfFilesInFolder (const unsigned int number);
     bool checkFileIfWaveFile(const string fn);

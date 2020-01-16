@@ -28,7 +28,7 @@ CApplinput::CApplinput(int argc, char* argv[]) :
     // set verbosity level to 2
     // ToDO read verbosity level from user input v
     optv = 2;
-    this->parse();
+    this->parseInputParameter();
 }
 
 CApplinput::~CApplinput() {
@@ -43,7 +43,7 @@ string CApplinput::getInputFolderName() const {
 unsigned int CApplinput::getNumOfFilesInFolder() const { // @suppress("Member declaration not found")
 	return uiNumberOfFilesInFolder;
 }
-void CApplinput::parse() {
+void CApplinput::parseInputParameter() {
     typedef pair<string, string> Option;
     Option* option = new pair<string, string>();
     for (const char* const * i = this->begin() + 1; i != this->end(); i++) {

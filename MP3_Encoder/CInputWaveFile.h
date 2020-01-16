@@ -21,7 +21,7 @@ public:
 
 	virtual ~CInputWaveFile();
 
-
+	void get_samples( unsigned int offset, unsigned int size, std::vector<char> & samples ) const;
 
     int16_t get_channels() const;
     int32_t get_samples_per_sec() const;
