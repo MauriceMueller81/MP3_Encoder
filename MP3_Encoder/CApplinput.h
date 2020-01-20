@@ -23,11 +23,12 @@ public:
     string getAppName() const;
     string getInputFolderName() const;
     unsigned int checkUserInputfolder(const std::string pathname);
-
+    void setApplicationVerbosity(const string verb);
     unsigned int getNumOfFilesInFolder() const;
     bool hasKey(const string&) const;
     Option* getParamFromKey(const string&) const;
     void printOptions() const;
+    void printUsage();
     string returnWaveFileNameFromIndex( const unsigned int index);
 
     int optv;

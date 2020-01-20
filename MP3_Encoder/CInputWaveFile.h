@@ -27,6 +27,8 @@ public:
     int32_t get_samples_per_sec() const;
     int32_t get_avg_bytes_per_sec() const;
     int32_t get_data_size() const;
+    int32_t get_blockAlign()const;
+    int32_t get_bitspersample()const;
 
     string getWaveFileName();
     // alternative wave header implementation

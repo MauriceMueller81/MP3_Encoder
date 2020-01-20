@@ -187,6 +187,14 @@ int32_t CInputWaveFile::get_data_size() const
 {
     return data.dataSIZE;
 }
+int32_t CInputWaveFile::get_blockAlign() const
+{
+    return fmt.nBlockAlign;
+}
+int32_t CInputWaveFile::get_bitspersample() const
+{
+    return fmt.wBitsPerSample;
+}
 
 CInputWaveFile::~CInputWaveFile() {
 	// TODO Auto-generated destructor stub

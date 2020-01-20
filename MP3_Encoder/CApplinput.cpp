@@ -34,6 +34,26 @@ CApplinput::CApplinput(int argc, char* argv[]) :
 CApplinput::~CApplinput() {
 }
 
+void CApplinput::printUsage()
+{
+#ifdef WINDOWS
+#else
+	cout << "MP3_Encoder useage:" << endl;
+	cout <<"MP3_Encoder [ -v <verbosity> optional -p <path> ]" << endl;
+	cout << "OPTIONS:" << endl;
+	cout << " -v <verbosity> "<< endl;
+	cout << "verbosity level. can be high, debug, normal. default is normal" << endl;
+	cout << "example: MP3_Encoder -v debug - prints all output information" << endl;
+	cout << " -p <path> "<< endl;
+	cout << "path to folder containing encoder iput files" << endl;
+	cout << "example: MP3_Encoder -p /home/Music" << endl;
+	cout << "function:" << endl;
+	cout << "encodes all *.wav files in folder /home/Music" << endl;
+	cout << "wave files must be in 16bit format and have a canonical header" << endl;
+
+
+#endif
+}
 string CApplinput::getAppName() const {
     return appName_;
 }
@@ -71,6 +91,16 @@ void CApplinput::parseInputParameter() {
             continue;
         }
     }
+}
+
+void CApplinput::setApplicationVerbosity(const string verb)
+{
+	if(verb == "high")
+			optv = 1;
+	else if (verb == "debug")
+		optv = 2;
+	else
+			optv = 0;
 }
 unsigned int CApplinput::checkUserInputfolder(const string pathname)
 {
@@ -178,8 +208,8 @@ bool CApplinput::hasKey(const std::string& key) const {
     return options_.find(key) != options_.end();
 }
 
-CApplinput::Option* CApplinput::getParamFromKey(
-        const std::string& key) const {
+CApplinput::Option* CApplinput::getParamFromKey(const string& key) const
+{
     const Options::const_iterator i = options_.find(key);
     CApplinput::Option* o = 0;
     if (i != options_.end()) {

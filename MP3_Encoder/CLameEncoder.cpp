@@ -19,6 +19,12 @@ namespace std {
 
 int CLameEncoder::optv = 2;
 
+static void LameDebugCB(const char *format, va_list ap)
+{
+    (void) vfprintf(stdout, format, ap);
+    printf("debug callback from lame \n");
+}
+
 CLameEncoder::CLameEncoder() {
 
 	if(!this->initLame())
@@ -29,11 +35,6 @@ CLameEncoder::~CLameEncoder() {
 	if(optv > 1)
 		printf("closing lame lib\n");
 	lame_close(psLame);
-}
-
-static void LameDebugCB(const char *format, va_list ap)
-{
-    (void) vfprintf(stdout, format, ap);
 }
 
 bool CLameEncoder::initLame(){
@@ -145,7 +146,6 @@ bool CLameEncoder::encode( const string & filename )
     unsigned char mp3_buffer[MP3_SIZE *2 ];
 
     lame_set_in_samplerate(this->psLame, sample_rate);
-
     lame_set_brate(psLame,byte_rate);
 
     if( channels == 1 )

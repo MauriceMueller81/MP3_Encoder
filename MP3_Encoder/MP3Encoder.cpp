@@ -9,23 +9,46 @@
 
 using namespace std;
 
+
+
 int main(int argc, char **argv) {
 
 	// create object of class CApplinput in automatic memory
 	CApplinput input(argc, argv);
 	// get the input options
-	CApplinput::Option* opt = input.getParamFromKey("-p");
+	CApplinput::Option* opt_path = input.getParamFromKey("-p");
+	CApplinput::Option* opt_verb = input.getParamFromKey("-v");
 
-	printf("application %s version %d started\n", input.getAppName().c_str(), version);
-	const string folderpath = opt ? (*opt).second : "";
-	/* user input folder check code */
+	// get application information
+	string tmp = input.getAppName();
+	const char * applicationName = (tmp.substr(tmp.find_last_of("/")+1) ).c_str();
+	// print name and version
+	printf("application %s version %.2f started\n", applicationName, version);
 
+	// check user input path if it is set
+	const string folderpath = opt_path ? (*opt_path).second : "";
+	if ((folderpath == "")||(folderpath=="null"))
+	{
+		//
+		printf("false user input: no input path set\n");
+		input.printUsage();
+		return -1;
+	}
+	const string verbosity = opt_verb ? (*opt_verb).second : "";
+	if(verbosity != "")
+		input.setApplicationVerbosity(verbosity);
+
+	input.printOptions();
+	printf("user input verbosity: %s\n", verbosity.c_str());
 	printf("user input folder path is: %s\n", folderpath.c_str());
+
+	/* user input folder check code */
 
 	if(input.optv > 1)
 		printf("checking input folder path if containing .wav files\n");
 	if(input.checkUserInputfolder(folderpath) < 1)
 	{
+		input.printUsage();
 		//exit
 		return -1;
 	}
@@ -38,11 +61,8 @@ int main(int argc, char **argv) {
 	// for every .wav file in the input folder a decoder will be set up
 	for (unsigned int var = 0; var < input.getNumOfFilesInFolder(); ++var)
 	{
-		// read out the .wav file name
-		//CInputWaveFile wave(folderpath + "/" + input.returnWaveFileNameFromIndex(var));
 		// encode wave file
 		sInputPath = folderpath + "/" + input.returnWaveFileNameFromIndex(var);
-
 		encoder.encode(sInputPath);
 
 	};
