@@ -12,6 +12,8 @@
 #include <vector>       // std::vector
 #include <stdint.h>     // int32_t, int16_t
 
+#include "encoderdef.h"
+
 namespace std {
 
 class CInputWaveFile {
@@ -98,7 +100,7 @@ public:
     static const int DATA_SIZE      = 8;
     static const int FACT_SIZE      = 8;
 
-    static const int optv = 2;
+    unsigned int optv;
 
 private:
     void setFilename(const string &path);

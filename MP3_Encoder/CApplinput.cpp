@@ -8,7 +8,7 @@
 #ifdef WINDOWS
 #include <windows.h>
 #endif
-#include "CApplinput.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <iostream>
@@ -16,6 +16,8 @@
 #include <dirent.h>
 #include <algorithm>
 
+#include "CApplinput.h"
+#include "encoderdef.h"
 
 using namespace std;
 
@@ -25,9 +27,7 @@ CApplinput::CApplinput(int argc, char* argv[]) :
     appName_ = argv_[0];
     InputFolderName = "";
     uiNumberOfFilesInFolder = 0;
-    // set verbosity level to 2
-    // ToDO read verbosity level from user input v
-    optv = 2;
+
     this->parseInputParameter();
 }
 
@@ -42,7 +42,7 @@ void CApplinput::printUsage()
 	cout <<"MP3_Encoder [ -v <verbosity> optional -p <path> ]" << endl;
 	cout << "OPTIONS:" << endl;
 	cout << " -v <verbosity> "<< endl;
-	cout << "verbosity level. can be high, debug, normal. default is normal" << endl;
+	cout << "verbosity level. can be low, debug, no. default is no output" << endl;
 	cout << "example: MP3_Encoder -v debug - prints all output information" << endl;
 	cout << " -p <path> "<< endl;
 	cout << "path to folder containing encoder iput files" << endl;
@@ -95,12 +95,16 @@ void CApplinput::parseInputParameter() {
 
 void CApplinput::setApplicationVerbosity(const string verb)
 {
-	if(verb == "high")
-			optv = 1;
+	//int optv;
+
+	if(verb == "low")
+		optv = VL_LOW;
 	else if (verb == "debug")
-		optv = 2;
+		optv = VL_DEBUG;
+	else if (verb == "no")
+		optv = VL_NO;
 	else
-			optv = 0;
+		optv = VL_NO; 	// default level is no printf information
 }
 unsigned int CApplinput::checkUserInputfolder(const string pathname)
 {

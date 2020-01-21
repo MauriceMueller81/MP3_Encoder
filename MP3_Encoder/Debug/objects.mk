@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lmp3lame
+LIBS := -lmp3lame -lpthread
 

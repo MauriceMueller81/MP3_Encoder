@@ -7,17 +7,18 @@
 #include <fstream>                  // std::ofstream
 #include <stdexcept>                // std::logic_error
 #include <stdio.h>
+#include <stdint.h>     			// int32_t, int16_t
 #include </usr/local/include/lame/lame.h>
+
 
 #include "CLameEncoder.h"
 #include "CInputWaveFile.h"
 #include "COutputEncodedFile.h"
 #include "encoderdef.h"
-#include <stdint.h>     // int32_t, int16_t
+
 
 namespace std {
 
-int CLameEncoder::optv = 2;
 
 static void LameDebugCB(const char *format, va_list ap)
 {
@@ -169,6 +170,7 @@ bool CLameEncoder::encode( const string & filename )
 
     while( true )
     {
+    	// read pcm data from pcm file and write to pcm_buffer
     	pcm.get_samples( offset, size, pcm_buffer );
     	read = pcm_buffer.size();
     	offset += read;
@@ -193,7 +195,7 @@ bool CLameEncoder::encode( const string & filename )
     		if (writeResult >= 0)
     			mp3.writeToMP3File( reinterpret_cast<char*>( mp3_buffer ) , writeResult );
     		else
-    			printf("error encoding input file errorcode: %d\n",writeResult );
+    			printf("error encoding input file error code: %d\n",writeResult );
     	}
 
     	if( read < size )
@@ -203,8 +205,8 @@ bool CLameEncoder::encode( const string & filename )
     		if (writeResult >= 0)
     			mp3.writeToMP3File( reinterpret_cast<char*>( mp3_buffer ) , writeResult );
     		else
-    			printf("error encoding input file errorcode: %d\n",writeResult );
-
+    			printf("error encoding input file error code: %d\n",writeResult );
+    		// break the while loop when finished
     		break;
     	}
 

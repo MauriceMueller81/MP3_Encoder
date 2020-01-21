@@ -31,7 +31,7 @@ public:
     void printUsage();
     string returnWaveFileNameFromIndex( const unsigned int index);
 
-    int optv;
+    unsigned int optv;
 private:
     typedef map<string, string> Options;
     void parseInputParameter();
@@ -49,6 +49,7 @@ private:
     string InputFolderName;
     unsigned int uiNumberOfFilesInFolder;
     vector<string>FilesInFolder;
+
 };
 
 #endif /* CAPPLINPUT_H_ */

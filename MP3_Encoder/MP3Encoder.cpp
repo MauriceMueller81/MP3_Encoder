@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+
+#ifdef WINDOWS
+// include the pthread_w32 header
+// do not forget to link the specific library
+#else
+#include <pthread.h>
+#endif
+
 #include </usr/local/include/lame/lame.h>
 #include "encoderdef.h"
 #include "CApplinput.h"
@@ -8,10 +16,14 @@
 
 
 using namespace std;
+// thread function
+unsigned int optv;
 
-
+void *thread_encoder(void *path);
+pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 
 int main(int argc, char **argv) {
+
 
 	// create object of class CApplinput in automatic memory
 	CApplinput input(argc, argv);
@@ -29,7 +41,6 @@ int main(int argc, char **argv) {
 	const string folderpath = opt_path ? (*opt_path).second : "";
 	if ((folderpath == "")||(folderpath=="null"))
 	{
-		//
 		printf("false user input: no input path set\n");
 		input.printUsage();
 		return -1;
@@ -38,13 +49,11 @@ int main(int argc, char **argv) {
 	if(verbosity != "")
 		input.setApplicationVerbosity(verbosity);
 
-	input.printOptions();
-	printf("user input verbosity: %s\n", verbosity.c_str());
-	printf("user input folder path is: %s\n", folderpath.c_str());
+	if(optv > VL_LOW)
+		input.printOptions();
 
 	/* user input folder check code */
-
-	if(input.optv > 1)
+	if(optv > VL_NO)
 		printf("checking input folder path if containing .wav files\n");
 	if(input.checkUserInputfolder(folderpath) < 1)
 	{
@@ -53,17 +62,55 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
+
 	string sInputPath = "";
+	// handling file encoding using threads
+	vector<pthread_t>  thread_vec;
+	unsigned int numOfFiles = input.getNumOfFilesInFolder();
+	thread_vec.reserve(numOfFiles);
+
+	// for every .wav file in the input folder a decoder will be set up
+	for (unsigned int var = 0; var < input.getNumOfFilesInFolder(); var++)
+	{
+		sInputPath = folderpath + "/" + input.returnWaveFileNameFromIndex(var);
+		// encode wave file
+
+	        int t = pthread_create(&thread_vec[var], NULL, thread_encoder, &sInputPath);
+
+	        if (t != 0)
+	        {
+	            cout << "Error in thread creation: " << t << endl;
+	        }
+	}
+    for(unsigned int j = 0 ; j < numOfFiles; j++)
+    {
+        void* status;
+        int t = pthread_join(thread_vec[j], &status);
+        if (t != 0)
+        {
+            cout << "Error in thread join: " << t << endl;
+            }
+    }
+
+}
+
+void *thread_encoder(void *path)
+
+{
+
+	string tmp = (*static_cast<string*>(path));
+
+	printf("Encoder Thread number %ld\n", pthread_self());
+	printf("Encoder thread path %s\n", tmp.c_str());
 
 	// create object of CLameEncoder class in automatic memory
 	// init lame library
 	CLameEncoder encoder;
-	// for every .wav file in the input folder a decoder will be set up
-	for (unsigned int var = 0; var < input.getNumOfFilesInFolder(); ++var)
-	{
-		// encode wave file
-		sInputPath = folderpath + "/" + input.returnWaveFileNameFromIndex(var);
-		encoder.encode(sInputPath);
 
-	};
+	encoder.encode(tmp);
+
+	//pthread_mutex_lock( &mutex1 );
+
+	//pthread_mutex_unlock( &mutex1 );
+
 }

@@ -83,9 +83,12 @@ CInputWaveFile::CInputWaveFile( const string & PathToFilename )
     else
         file.read( reinterpret_cast<char*>( &data.dataSIZE ), 4 );
 
+    // this part reads all data of the wave file after resizing the buffer (vector Buffer)
+    // resize vector
     wave_.resize( data.dataSIZE );
-
+    // read all data
     file.read( & wave_[0], data.dataSIZE );
+
 }
 string CInputWaveFile::getWaveFileName()
 {

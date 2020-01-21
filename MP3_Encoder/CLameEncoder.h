@@ -21,8 +21,10 @@ public:
    // static void LameDebugCB(const char *format, va_list ap);
 
     lame_t psLame;
+
+    unsigned int optv;
+
 private:
-    static int optv;
     bool initLame();
 
 };
