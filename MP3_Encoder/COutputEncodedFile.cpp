@@ -6,6 +6,7 @@
  */
 
 #include "COutputEncodedFile.h"
+#include "encoderdef.h"
 #include <string>
 #include <fstream>
 
@@ -21,7 +22,8 @@ COutputEncodedFile::COutputEncodedFile(const string & filename )
 {
 	// construct the output filename by renaming it to *.mp3
 	initializeOutputFilename(filename);
-	printf("writing encoded data to %s\n", this->getOutputFileName().c_str());
+	if(optv > VL_LOW)
+		printf("writing encoded data to %s\n", this->getOutputFileName().c_str());
 
 	// setup output
 	mp3Output.open( getOutputFileName().c_str(), std::ios_base::binary | std::ios_base::out  );

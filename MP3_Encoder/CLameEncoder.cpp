@@ -15,6 +15,7 @@
 #include "CInputWaveFile.h"
 #include "COutputEncodedFile.h"
 #include "encoderdef.h"
+#include "CEncoderLogger.h"
 
 
 namespace std {
@@ -33,7 +34,10 @@ CLameEncoder::CLameEncoder() {
 }
 
 CLameEncoder::~CLameEncoder() {
-	if(optv > 1)
+	closeLameLib();
+}
+void CLameEncoder::closeLameLib() {
+	if(optv > VL_LOW)
 		printf("closing lame lib\n");
 	lame_close(psLame);
 }
@@ -45,8 +49,11 @@ bool CLameEncoder::initLame(){
 	psLame = lame_init();
 
 	if(psLame != NULL)
-		printf("init lame version %s successful\n", get_lame_version());
-	else
+	{
+		if(optv > VL_LOW)
+			printf("init lame version %s successful\n", get_lame_version());
+	}
+		else
 	 {
 		printf("init NOT successfull\n");
 		return ret;
@@ -61,7 +68,8 @@ bool CLameEncoder::initLame(){
 	// configure lame encoder
 	// read out the quality level
 	int quality = lame_get_quality(psLame);
-	printf("current quality is set to %d\n", quality);
+	if(optv > VL_LOW)
+		printf("current quality is set to %d\n", quality);
 	// set quality to good
 	if(lame_set_quality(psLame,LAME_QUAL_GOOD ) < 0 )
 		printf("set quality failure\n");
@@ -69,8 +77,11 @@ bool CLameEncoder::initLame(){
 	{
 		// re read out the new quality level
 		quality = lame_get_quality(psLame);
-		printf("current quality is set to %d\n", quality);
-		printf("set quality to level good\n");
+		if(optv > VL_LOW)
+		{
+			printf("current quality is set to %d\n", quality);
+			printf("set quality to level good\n");
+		}
 		ret = true;
 	}
 
@@ -87,12 +98,23 @@ bool CLameEncoder::initLame(){
 }
 bool CLameEncoder::encode( const string & filename )
 {
+	bool bResult = true;
+
     unsigned int sample_rate    = 0;
     unsigned int byte_rate      = 0;
     unsigned int channels       = 0;
 
     // create object of class CInputWave in automatic memory
-	CInputWaveFile  pcm( filename );
+	CInputWaveFile  pcm;
+	if( pcm.openWaveFile( filename ) < 0 )
+	{
+		bResult = false;
+		closeLameLib();
+		return bResult;
+	}
+
+    if(optv > VL_NO)
+    	printf("start encoding of %s\n", pcm.getWaveFileName().c_str() );
 
 	// create object of class COutputEncodedFile in automatic memory
 	COutputEncodedFile mp3(filename);
@@ -142,7 +164,8 @@ bool CLameEncoder::encode( const string & filename )
 
     int calcMP3Size =  (pcm_buffer.size()/2)* (byte_rate/sample_rate) + 4*1152*(byte_rate)/sample_rate + 512;
 
-    printf("calculated Buffer size = %d default is %d\n", calcMP3Size, MP3_SIZE);
+    if(optv > VL_LOW)
+    	printf("calculated Buffer size = %d default is %d\n", calcMP3Size, MP3_SIZE);
 
     unsigned char mp3_buffer[MP3_SIZE *2 ];
 
@@ -175,8 +198,6 @@ bool CLameEncoder::encode( const string & filename )
     	read = pcm_buffer.size();
     	offset += read;
     	read_shorts = read / 4;
-    	if(optv > 2 )
-    		printf("read = %d --- read_shorts = %d\n",read, read_shorts );
     	if( read > 0 )
     	{
     		if( channels == 1 )
@@ -211,7 +232,7 @@ bool CLameEncoder::encode( const string & filename )
     	}
 
     }
-    if(optv > 1)
+    if(optv > VL_NO)
     	printf("encoding of file %s finished\n", pcm.getWaveFileName().c_str() );
     return true;
 }

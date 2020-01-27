@@ -6,10 +6,11 @@
  */
 
 #include "CInputWaveFile.h"
-
+#include "CEncoderLogger.h"
 #include <iostream>
 #include <fstream>          // std::ofstream
 #include <stdio.h>
+#include <string.h>
 
 using namespace std;
 
@@ -17,8 +18,10 @@ CInputWaveFile::CInputWaveFile() {
 	extra_param_length_ = 0;
 }
 
-CInputWaveFile::CInputWaveFile( const string & PathToFilename )
+int CInputWaveFile::openWaveFile( const string & PathToFilename )
 {
+	int iRet = 0;
+
     fmt.wFormatTag      = 0;
     extra_param_length_ = 0;
     fact.samplesNumber  = -1;
@@ -27,8 +30,9 @@ CInputWaveFile::CInputWaveFile( const string & PathToFilename )
 
     const char* wavefilename = PathToFilename.c_str();
 
-    if(optv >1)
+    if(optv > VL_LOW)
     	printf("extracting wave header information of file %s\n", wavefilename);
+
 
     // try alternative waveheader
     //WavReader(wavefilename, "test.wav");
@@ -38,19 +42,38 @@ CInputWaveFile::CInputWaveFile( const string & PathToFilename )
 
     if( file.is_open() == false )
     {
-    	// ToDO : use exceptions?
-        //throw std::runtime_error( strerror( errno ) );
+    	CEncoderLogger::ErrorLog("file is not open");
+    	file.close();
+    	iRet = -1;
+    	return iRet;
     }
 
     file.read( reinterpret_cast<char*>( &riff ), RIFF_SIZE );
-    if(optv > 1)
+
+    if(optv > VL_LOW)
     	printf("riffID:  %s size: %d Format: %s\n", riff.riffID, riff.riffSIZE, riff.riffFORMAT );
 
+
     file.read( reinterpret_cast<char*>( &fmthdr ), FMTHDR_SIZE );
-    if(optv > 1)
+
+    if(optv > VL_LOW)
     	printf("fmtID:  %s size: %d \n", fmthdr.fmtID, fmthdr.fmtSIZE );
+
+    // check if it is a format ID is fmt or JUNK. JUNK not supported currently
+    if( ( strncmp(fmthdr.fmtID , "JUNK", 4) ) == 0)
+    {
+    	printf("encoding %s not possible \n", getWaveFileName().c_str());
+    	printf("file is in JUNK format, currently not supported\n");
+    	// so we return here for this file
+
+    	file.close();
+    	iRet = -1;
+    	return iRet;
+
+    }
     file.read( reinterpret_cast<char*>( &fmt ), FMT_SIZE );
-    if(optv > 1)
+
+    if(optv > VL_LOW)
     	printf("format Tag:  %d channels: %d  Samples per sec: %d avg bytes per sec: %d block align: %d bits per sample: %d\n"
     			, fmt.wFormatTag, fmt.nChannels, fmt.nSamplesPerSec, fmt.nAvgBytesPerSec, fmt.nBlockAlign, fmt.wBitsPerSample );
 
@@ -88,6 +111,7 @@ CInputWaveFile::CInputWaveFile( const string & PathToFilename )
     wave_.resize( data.dataSIZE );
     // read all data
     file.read( & wave_[0], data.dataSIZE );
+    return iRet;
 
 }
 string CInputWaveFile::getWaveFileName()

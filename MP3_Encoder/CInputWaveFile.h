@@ -19,7 +19,7 @@ namespace std {
 class CInputWaveFile {
 public:
 	CInputWaveFile();
-	CInputWaveFile( const string & filename );
+	int openWaveFile( const string & filename );
 
 	virtual ~CInputWaveFile();
 
@@ -100,7 +100,7 @@ public:
     static const int DATA_SIZE      = 8;
     static const int FACT_SIZE      = 8;
 
-    unsigned int optv;
+    //unsigned int optv;
 
 private:
     void setFilename(const string &path);

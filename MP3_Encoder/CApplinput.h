@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+#include "encoderdef.h"
+
 using namespace std;
 
 class CApplinput {
@@ -31,7 +33,7 @@ public:
     void printUsage();
     string returnWaveFileNameFromIndex( const unsigned int index);
 
-    unsigned int optv;
+    //unsigned int optv;
 private:
     typedef map<string, string> Options;
     void parseInputParameter();

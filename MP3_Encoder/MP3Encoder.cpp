@@ -13,7 +13,7 @@
 #include "encoderdef.h"
 #include "CApplinput.h"
 #include "CLameEncoder.h"
-
+#include "CEncoderLogger.h"
 
 using namespace std;
 // thread function
@@ -21,6 +21,8 @@ unsigned int optv;
 
 void *thread_encoder(void *path);
 pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+
+void *thread_timer(void *a);
 
 int main(int argc, char **argv) {
 
@@ -35,7 +37,9 @@ int main(int argc, char **argv) {
 	string tmp = input.getAppName();
 	const char * applicationName = (tmp.substr(tmp.find_last_of("/")+1) ).c_str();
 	// print name and version
-	printf("application %s version %.2f started\n", applicationName, version);
+	printf("%s version %.2f started\n", applicationName, version);
+
+	//CEncoderLogger::EncoderLog("%s version %.2f started\n","cd", applicationName, version);
 
 	// check user input path if it is set
 	const string folderpath = opt_path ? (*opt_path).second : "";
@@ -62,7 +66,14 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
+/*
+	if(optv == VL_DEBUG)
+	{
+		pthread_t timer;
+		pthread_create(&timer, NULL, thread_timer, NULL);
 
+	}
+	*/
 	string sInputPath = "";
 	// handling file encoding using threads
 	vector<pthread_t>  thread_vec;
@@ -91,7 +102,13 @@ int main(int argc, char **argv) {
             cout << "Error in thread join: " << t << endl;
             }
     }
+/*
+	if(optv == VL_DEBUG)
+	{
+		pthread_join(timer, &status);
 
+	}
+*/
 }
 
 void *thread_encoder(void *path)
@@ -99,10 +116,11 @@ void *thread_encoder(void *path)
 {
 
 	string tmp = (*static_cast<string*>(path));
-
-	printf("Encoder Thread number %ld\n", pthread_self());
-	printf("Encoder thread path %s\n", tmp.c_str());
-
+	if(optv > VL_LOW)
+	{
+		printf("Encoder Thread number %ld\n", pthread_self());
+		printf("Encoder thread path %s\n", tmp.c_str());
+	}
 	// create object of CLameEncoder class in automatic memory
 	// init lame library
 	CLameEncoder encoder;
@@ -114,3 +132,16 @@ void *thread_encoder(void *path)
 	//pthread_mutex_unlock( &mutex1 );
 
 }
+void *thread_timer(void *a)
+
+{
+
+
+	printf("Timer Thread number %ld\n", pthread_self());
+
+	//pthread_mutex_lock( &mutex1 );
+
+	//pthread_mutex_unlock( &mutex1 );
+
+}
+

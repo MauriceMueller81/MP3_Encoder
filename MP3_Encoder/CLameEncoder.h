@@ -22,10 +22,9 @@ public:
 
     lame_t psLame;
 
-    unsigned int optv;
-
 private:
     bool initLame();
+    void closeLameLib();
 
 };
 

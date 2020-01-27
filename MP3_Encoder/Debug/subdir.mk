@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../CApplinput.cpp \
+../CEncoderLogger.cpp \
 ../CInputWaveFile.cpp \
 ../CLameEncoder.cpp \
 ../COutputEncodedFile.cpp \
@@ -12,6 +13,7 @@ CPP_SRCS += \
 
 OBJS += \
 ./CApplinput.o \
+./CEncoderLogger.o \
 ./CInputWaveFile.o \
 ./CLameEncoder.o \
 ./COutputEncodedFile.o \
@@ -19,6 +21,7 @@ OBJS += \
 
 CPP_DEPS += \
 ./CApplinput.d \
+./CEncoderLogger.d \
 ./CInputWaveFile.d \
 ./CLameEncoder.d \
 ./COutputEncodedFile.d \

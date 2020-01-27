@@ -95,7 +95,6 @@ void CApplinput::parseInputParameter() {
 
 void CApplinput::setApplicationVerbosity(const string verb)
 {
-	//int optv;
 
 	if(verb == "low")
 		optv = VL_LOW;
@@ -115,7 +114,8 @@ unsigned int CApplinput::checkUserInputfolder(const string pathname)
 	    printf( "cannot access %s\n", pathname.c_str() );
 	else if( info.st_mode & S_IFDIR )  // S_ISDIR() doesn't exist on my windows
 		{
-			printf( "%s is a directory\n", pathname.c_str() );
+			if (optv > VL_LOW)
+				printf( "%s is a directory\n", pathname.c_str() );
 			// save the folder name
 			setFolderName(pathname);
 		}
@@ -160,7 +160,7 @@ int CApplinput::getWaveFilesInDirectory(const string &directory, vector<string> 
 	    	{
 	    		ret++;
 	    		out.push_back(dp->d_name);
-	    		if(optv > 1)
+	    		if(optv > VL_LOW)
 	    			printf("current file: %s\n", dp->d_name);
 	    	}
 	    }
