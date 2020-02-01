@@ -106,7 +106,7 @@ bool CLameEncoder::encode( const string & filename )
 
     // create object of class CInputWave in automatic memory
 	CInputWaveFile  pcm;
-	if( pcm.openWaveFile( filename ) < 0 )
+	if( pcm.parseWaveFile/*openWaveFile*/( filename ) < 0 )
 	{
 		bResult = false;
 		closeLameLib();

@@ -20,6 +20,7 @@ class CInputWaveFile {
 public:
 	CInputWaveFile();
 	int openWaveFile( const string & filename );
+	int parseWaveFile( const string & PathToFilename );
 
 	virtual ~CInputWaveFile();
 
@@ -33,8 +34,7 @@ public:
     int32_t get_bitspersample()const;
 
     string getWaveFileName();
-    // alternative wave header implementation
-    void WavReader (const char* fileName, const char* fileToSave);
+
     //Chunks
     struct chunk_t
     {
@@ -42,21 +42,11 @@ public:
         unsigned long size;  //Chunk data bytes
     };
 
-    struct wav_header_t
+    struct chunkHdr
     {
-        char chunkID[4]; //"RIFF" = 0x46464952
-        unsigned long chunkSize; //28 [+ sizeof(wExtraFormatBytes) + wExtraFormatBytes] + sum(sizeof(chunk.id) + sizeof(chunk.size) + chunk.size)
-        char format[4]; //"WAVE" = 0x45564157
-        char subchunk1ID[4]; //"fmt " = 0x20746D66
-        unsigned long subchunk1Size; //16 [+ sizeof(wExtraFormatBytes) + wExtraFormatBytes]
-        unsigned short audioFormat;
-        unsigned short numChannels;
-        unsigned long sampleRate;
-        unsigned long byteRate;
-        unsigned short blockAlign;
-        unsigned short bitsPerSample;
-        //[WORD wExtraFormatBytes;]
-        //[Extra format bytes]
+       char id[4];
+       unsigned int size;
+       unsigned int pos;
     };
 
     struct RIFF
@@ -104,6 +94,11 @@ public:
 
 private:
     void setFilename(const string &path);
+
+    bool isChunkID(const chunkHdr &c, char id1, char id2, char id3, char id4);
+    void readHeaderIDandSize(ifstream &f, chunkHdr &c, chunkHdr *parent);
+    void skip(ifstream &f, streamsize size, chunkHdr *parent);
+    void readHeaderToBuffer(ifstream &f, void *buffer, streamsize size, chunkHdr *parent);
 
     vector<char>   wave_;
     RIFF        riff;

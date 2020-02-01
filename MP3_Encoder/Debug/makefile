@@ -43,7 +43,7 @@ all: MP3_Encoder
 MP3_Encoder: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L/usr/local/lib -static -o "MP3_Encoder" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/usr/local/lib -o "MP3_Encoder" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
