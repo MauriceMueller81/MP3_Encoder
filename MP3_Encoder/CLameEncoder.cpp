@@ -96,6 +96,33 @@ bool CLameEncoder::initLame(){
 	}
 	return ret;
 }
+void CLameEncoder::setOutputFilename(const string name)
+{
+	if(name != "")
+		outputFileName = name;
+}
+/*
+ * print out lame encoder configuration
+ * */
+void CLameEncoder::showLameConfig()
+{
+
+	// show only in Dubug mode:
+	if(optv > VL_LOW)
+	{
+		printf( "get number of samples: %d\n", lame_get_num_samples(psLame));
+		printf( "current out sample rate: %d\n", lame_get_out_samplerate(psLame));
+		// show curent lame encoder configuration
+		printf( "current bitrate: %d\n", lame_get_brate(psLame));
+		// get compression ration
+		printf( "current compression: %.2f\n", lame_get_compression_ratio(psLame));
+		// get scale factor
+		printf( "current scale: %.2f\n",lame_get_scale(psLame));
+	}
+}
+/*
+ * encode a given file with path
+ * */
 bool CLameEncoder::encode( const string & filename )
 {
 	bool bResult = true;
@@ -103,6 +130,7 @@ bool CLameEncoder::encode( const string & filename )
     unsigned int sample_rate    = 0;
     unsigned int byte_rate      = 0;
     unsigned int channels       = 0;
+    unsigned int blockalign		= 0;
 
     // create object of class CInputWave in automatic memory
 	CInputWaveFile  pcm;
@@ -119,10 +147,13 @@ bool CLameEncoder::encode( const string & filename )
 	// create object of class COutputEncodedFile in automatic memory
 	COutputEncodedFile mp3(filename);
 
+	setOutputFilename(mp3.getOutputFileName());
+
+	// get information of wav file header
 	byte_rate = pcm.get_avg_bytes_per_sec();
 	sample_rate = pcm.get_samples_per_sec();
 	channels = pcm.get_channels();
-
+	blockalign = pcm.get_blockAlign();
 	// ToDo: check the MP3 Size
     /*
      * input pcm data, output (maybe) mp3 frames.
@@ -157,16 +188,6 @@ bool CLameEncoder::encode( const string & filename )
      *
     */
 
-    unsigned offset = 0;
-
-    std::vector<char> pcm_buffer;
-    pcm_buffer.reserve( sizeof(short int) * PCM_SIZE * 2 );
-
-    int calcMP3Size =  (pcm_buffer.size()/2)* (byte_rate/sample_rate) + 4*1152*(byte_rate)/sample_rate + 512;
-
-    if(optv > VL_LOW)
-    	printf("calculated Buffer size = %d default is %d\n", calcMP3Size, MP3_SIZE);
-
     unsigned char mp3_buffer[MP3_SIZE *2 ];
 
     lame_set_in_samplerate(this->psLame, sample_rate);
@@ -185,31 +206,56 @@ bool CLameEncoder::encode( const string & filename )
     lame_set_VBR(psLame, vbr_default);
     lame_init_params(psLame);
 
-    int k = ( channels == 1 ) ? 1 : 2;
-    unsigned size = PCM_SIZE * k * sizeof( short int );
-    unsigned read = pcm_buffer.size();
-    unsigned read_shorts = read / 2;  // need number of 'short int' read
+    this->showLameConfig();
+
+    unsigned offset = 0;
+    // this is the tempbuffer for the encoder input
+    std::vector<char> pcm_buffer;
+    // this will be for 16 bit input only!
+    //pcm_buffer.reserve( sizeof(short int) * PCM_SIZE * 2 );
+    // we will use BlockAllign for calclulation number of bytes per sample for all channels
+    pcm_buffer.reserve( blockalign * PCM_SIZE  );
+
+    int calcMP3Size =  (pcm_buffer.size()/2)* (byte_rate/sample_rate) + 4*1152*(byte_rate)/sample_rate + 512;
+
+    if(optv > VL_LOW)
+    	printf("calculated Buffer size = %d default is %d\n", calcMP3Size, MP3_SIZE);
+
+    //unsigned size = PCM_SIZE * k * sizeof( short int );
+    // size : number of Bytes from all channels in PCMBuffer
+    unsigned size = PCM_SIZE * blockalign;
+    unsigned BytesInPCMBuffer = pcm_buffer.size();
+    unsigned NumOfSamplesPerChannel = BytesInPCMBuffer / 2;  // need number of 'short int' read
     int writeResult = 0;
 
     while( true )
     {
-    	// read pcm data from pcm file and write to pcm_buffer
+    	// read size bytes of data from wav file and write to pcm_buffer
     	pcm.get_samples( offset, size, pcm_buffer );
-    	read = pcm_buffer.size();
-    	offset += read;
-    	read_shorts = read / 4;
-    	if( read > 0 )
+    	BytesInPCMBuffer = pcm_buffer.size();
+    	offset += BytesInPCMBuffer;
+    	NumOfSamplesPerChannel = (BytesInPCMBuffer / blockalign);
+    	if( BytesInPCMBuffer > 0 )
     	{
     		if( channels == 1 )
     		{
-    			//writeResult = lame_encode_buffer(psLame, reinterpret_cast<short int*>( &pcm_buffer[0] ), NULL, read_shorts, mp3_buffer, /*MP3_SIZE*/0 );
-    			writeResult = lame_encode_buffer( psLame, (short int*)(&pcm_buffer[0]) , NULL, 2* read_shorts, mp3_buffer, MP3_SIZE );
+    			// encode mono files
+    			if(blockalign == 2)
+    				writeResult = lame_encode_buffer( psLame, reinterpret_cast<short int*>(&pcm_buffer[0]) , NULL, NumOfSamplesPerChannel, mp3_buffer, MP3_SIZE );
+    			else
+    			{
+    				writeResult = lame_encode_buffer_int( psLame, reinterpret_cast<int*>(&pcm_buffer[0]) , NULL, NumOfSamplesPerChannel, mp3_buffer, MP3_SIZE );
+    			}
     		}
     		else
     		{
+    			// if 24 or 32 bit are used
+    			if(blockalign > 4)
+    				writeResult = lame_encode_buffer_interleaved_int( psLame, reinterpret_cast<int*>( &pcm_buffer[0] ), NumOfSamplesPerChannel, mp3_buffer, MP3_SIZE );
+    			//	writeResult = lame_encode_buffer_interleaved( psLame, reinterpret_cast<short int*>( &pcm_buffer[0] ), NumOfSamplesPerChannel, mp3_buffer, MP3_SIZE );
+    			else // for 16 bit and 8 bit
+    				writeResult = lame_encode_buffer_interleaved( psLame, reinterpret_cast<short int*>( &pcm_buffer[0] ), NumOfSamplesPerChannel, mp3_buffer, MP3_SIZE );
 
-    			//writeResult = lame_encode_buffer_interleaved( psLame, reinterpret_cast<short int*>( &pcm_buffer[0] ), read_shorts, mp3_buffer, /*MP3_SIZE*/0 );
-    			writeResult = lame_encode_buffer_interleaved( psLame, (short int*)( &pcm_buffer[0] ), read_shorts, mp3_buffer, MP3_SIZE );
     		}
     		// clean the tmp buffer
     		pcm_buffer.clear();
@@ -219,7 +265,7 @@ bool CLameEncoder::encode( const string & filename )
     			printf("error encoding input file error code: %d\n",writeResult );
     	}
 
-    	if( read < size )
+    	if( BytesInPCMBuffer < size )
     	{
     		writeResult = lame_encode_flush(psLame, mp3_buffer, MP3_SIZE );
 
@@ -231,7 +277,11 @@ bool CLameEncoder::encode( const string & filename )
     		break;
     	}
 
-    }
+    }// end of while
+
+    // set the mp3 tags
+    //lame_mp3_tags_fid(psLame, output);
+
     if(optv > VL_NO)
     	printf("encoding of file %s finished\n", pcm.getWaveFileName().c_str() );
     return true;

@@ -18,6 +18,7 @@ public:
 	CLameEncoder();
 	virtual ~CLameEncoder();
     bool encode( const string & filename );
+
    // static void LameDebugCB(const char *format, va_list ap);
 
     lame_t psLame;
@@ -25,6 +26,11 @@ public:
 private:
     bool initLame();
     void closeLameLib();
+    void setOutputFilename(const string name );
+    void showLameConfig();
+    void SetMP3Tags(void);
+
+    string outputFileName;
 
 };
 

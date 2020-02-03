@@ -24,6 +24,8 @@ pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 
 void *thread_timer(void *a);
 
+void setPthreadAffinity(const pthread_t thread);
+
 int main(int argc, char **argv) {
 
 
@@ -80,28 +82,31 @@ int main(int argc, char **argv) {
 	unsigned int numOfFiles = input.getNumOfFilesInFolder();
 	thread_vec.reserve(numOfFiles);
 
+
 	// for every .wav file in the input folder a decoder will be set up
 	for (unsigned int var = 0; var < input.getNumOfFilesInFolder(); var++)
 	{
 		sInputPath = folderpath + "/" + input.returnWaveFileNameFromIndex(var);
+		// set CPU affinity:
+
 		// encode wave file
+		int t = pthread_create(&thread_vec[var], NULL, thread_encoder, &sInputPath);
+		if (t != 0)
+		{
+			cout << "Error in thread creation: " << t << endl;
+		}
 
-	        int t = pthread_create(&thread_vec[var], NULL, thread_encoder, &sInputPath);
-
-	        if (t != 0)
-	        {
-	            cout << "Error in thread creation: " << t << endl;
-	        }
+		setPthreadAffinity(thread_vec[var]);
 	}
-    for(unsigned int j = 0 ; j < numOfFiles; j++)
-    {
-        void* status;
-        int t = pthread_join(thread_vec[j], &status);
-        if (t != 0)
-        {
-            cout << "Error in thread join: " << t << endl;
-            }
-    }
+	for(unsigned int j = 0 ; j < numOfFiles; j++)
+	{
+		void* status;
+		int t = pthread_join(thread_vec[j], &status);
+		if (t != 0)
+		{
+			cout << "Error in thread join: " << t << endl;
+		}
+	}
 /*
 	if(optv == VL_DEBUG)
 	{
@@ -115,6 +120,7 @@ void *thread_encoder(void *path)
 
 {
 
+	int reVal = 0;
 	string tmp = (*static_cast<string*>(path));
 	if(optv > VL_LOW)
 	{
@@ -131,17 +137,33 @@ void *thread_encoder(void *path)
 
 	//pthread_mutex_unlock( &mutex1 );
 
+	pthread_exit((void*)reVal);
+
 }
 void *thread_timer(void *a)
 
 {
-
-
 	printf("Timer Thread number %ld\n", pthread_self());
 
-	//pthread_mutex_lock( &mutex1 );
+}
+void setPthreadAffinity(const pthread_t thread)
+{
+	int s, j;
+	cpu_set_t cpuset;
+	for (j = 0; j < 2; j++)
+		CPU_SET(j, &cpuset);
+	s = pthread_setaffinity_np(thread, sizeof(cpu_set_t), &cpuset);
+	if (s != 0)
+		printf("pthread_setaffinity_np: %d \n" ,s );
 
-	//pthread_mutex_unlock( &mutex1 );
+	/* Check the actual affinity mask assigned to the thread */
+	s = pthread_getaffinity_np(thread, sizeof(cpu_set_t), &cpuset);
+	if (s != 0)
+		printf("pthread_setaffinity_np: %d \n" ,s );
+
+	printf("Set returned by pthread_getaffinity_np() contained:\n");
+	for (j = 0; j < CPU_SETSIZE; j++)
+		if (CPU_ISSET(j, &cpuset))
+			printf("    CPU %d\n", j);
 
 }
-

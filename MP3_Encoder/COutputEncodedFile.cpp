@@ -30,7 +30,10 @@ COutputEncodedFile::COutputEncodedFile(const string & filename )
 
 }
 COutputEncodedFile::~COutputEncodedFile() {
-	// TODO Auto-generated destructor stub
+
+	if(optv > VL_NO)
+		printf("closing output MP3\n");
+	mp3Output.close();
 }
 
 void COutputEncodedFile::initializeOutputFilename(const string & ofn){
