@@ -5,10 +5,12 @@
  *      Author: maurice
  */
 
-#include "COutputEncodedFile.h"
-#include "encoderdef.h"
+
 #include <string>
 #include <fstream>
+
+#include "../include/COutputEncodedFile.h"
+#include "../include/encoderdef.h"
 
 namespace std {
 

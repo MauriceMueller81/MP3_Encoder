@@ -5,12 +5,15 @@
  *      Author: maurice
  */
 
-#include "CInputWaveFile.h"
-#include "CEncoderLogger.h"
+
 #include <iostream>
 #include <fstream>          // std::ofstream
 #include <stdio.h>
 #include <string.h>
+
+
+#include "../include/CInputWaveFile.h"
+#include "../include/CEncoderLogger.h"
 
 using namespace std;
 
