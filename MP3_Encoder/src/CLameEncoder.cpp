@@ -8,8 +8,13 @@
 #include <stdexcept>                // std::logic_error
 #include <stdio.h>
 #include <stdint.h>     			// int32_t, int16_t
-//#include </usr/local/include/lame/lame.h>
 
+
+#if defined(__cplusplus)
+extern "C"{
+#include </usr/local/include/lame/lame.h>
+}
+#endif
 
 #include "../include/CLameEncoder.h"
 #include "../include/CInputWaveFile.h"

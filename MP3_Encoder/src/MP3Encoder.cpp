@@ -9,8 +9,6 @@
 #include <pthread.h>
 #endif
 
-//#include </usr/local/include/lame/lame.h>
-#include "../include/lame.h"
 #include "../include/encoderdef.h"
 #include "../include/CApplinput.h"
 #include "../include/CLameEncoder.h"

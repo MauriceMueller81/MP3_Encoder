@@ -10,7 +10,8 @@
 
 #include <stdio.h>
 //#include </usr/local/include/lame/lame.h>
-#include "../include/lame.h"
+
+#include "lame._h"
 
 namespace std {
 
