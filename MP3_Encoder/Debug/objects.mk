@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lmp3lame -lpthread
+LIBS := -l/usr/local/lib/libmp3lame.a
 

@@ -16,8 +16,8 @@
 #include <dirent.h>
 #include <algorithm>
 
-#include "CApplinput.h"
-#include "encoderdef.h"
+#include "../include/CApplinput.h"
+#include "../include/encoderdef.h"
 
 using namespace std;
 

@@ -9,7 +9,9 @@
 #define CLAMEENCODER_H_
 
 #include <stdio.h>
-#include </usr/local/include/lame/lame.h>
+//#include </usr/local/include/lame/lame.h>
+
+#include "lame._h"
 
 namespace std {
 

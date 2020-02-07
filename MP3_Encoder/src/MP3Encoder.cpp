@@ -9,11 +9,10 @@
 #include <pthread.h>
 #endif
 
-#include </usr/local/include/lame/lame.h>
-#include "encoderdef.h"
-#include "CApplinput.h"
-#include "CLameEncoder.h"
-#include "CEncoderLogger.h"
+#include "../include/encoderdef.h"
+#include "../include/CApplinput.h"
+#include "../include/CLameEncoder.h"
+#include "../include/CEncoderLogger.h"
 
 using namespace std;
 // thread function
