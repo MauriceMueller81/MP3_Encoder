@@ -12,7 +12,11 @@
 
 #if defined(__cplusplus)
 extern "C"{
+#ifdef WINDOWS
+#include "../include/lame.h"
+#else
 #include </usr/local/include/lame/lame.h>
+#endif
 }
 #endif
 

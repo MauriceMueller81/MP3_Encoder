@@ -11,7 +11,8 @@
 #include <stdio.h>
 //#include </usr/local/include/lame/lame.h>
 
-#include "lame._h"
+
+#include "lame.h"
 
 namespace std {
 

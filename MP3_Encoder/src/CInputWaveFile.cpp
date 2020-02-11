@@ -35,8 +35,8 @@ void CInputWaveFile::readHeaderToBuffer(ifstream &f, void *buffer, streamsize si
     if (!f.read(static_cast<char*>(buffer), size))
     {
         if (f.eof())
-            throw runtime_error("Unexpected EOF while reading from file");
-        throw runtime_error("Unable to read from file");
+            /*throw runtime_error*/CEncoderLogger::ErrorLog("Unexpected EOF while reading from file");
+        /*throw runtime_error*/CEncoderLogger::ErrorLog("Unable to read from file");
     }
     if (parent)
     	parent->pos += size;
@@ -45,7 +45,7 @@ void CInputWaveFile::readHeaderToBuffer(ifstream &f, void *buffer, streamsize si
 void CInputWaveFile::skip(ifstream &f, streamsize size, chunkHdr *parent)
 {
     if (!f.seekg(size, ios_base::cur))
-        throw runtime_error("Unable to read from file");
+        /*throw runtime_error*/CEncoderLogger::ErrorLog("Unable to read from file");
     if (parent) parent->pos += size;
 }
 

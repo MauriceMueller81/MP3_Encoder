@@ -6,6 +6,7 @@ CXXFLAGS := -pedantic-errors -Wall -Wextra
 LDFLAGS  := -L/usr/local/lib
 LIBS	 := -lmp3lame -pthread 
 BUILD    := ./build
+ENV      := LINUX
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
 TARGET   := MP3Encoder
@@ -20,20 +21,13 @@ SRC      :=                      \
 
 OBJECTS := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 
-#BUILD_MODE = debug
-
-#ifeq ($(BUILD_MODE),debug)
-#	CXXFLAGS += -g
-#else ifeq ($(BUILD_MODE),run)
-#	CXXFLAGS += -O2
-#else
-#	$(error Build mode $(BUILD_MODE) not supported by this Makefile)
-#endif
-
+# makes folders for app
 all: build $(APP_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: %.cpp
 	@printf " build directory is :`pwd` \n"
+	@printf " compilers C++:$(CXX) \n"
+	@printf " building for target:$(ENV)\n"	
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -o $@ -c $<
 
@@ -52,6 +46,14 @@ debug: all
 
 release: CXXFLAGS += -O3
 release: all
+#use mingw for windows build
+windows: CXX = $(CC)
+windows: ENV = WINDOWS
+windows: CXXFLAGS += -DWINDOWS
+windows: LDFLAGS  = -L./external -v
+windows: INCLUDE  = -I./include 
+windows: LIBS	  = -lstdc++ -lmp3lame -pthread
+windows: all
 
 clean:
 	-@rm -rvf $(OBJ_DIR)/*

@@ -3,7 +3,8 @@
 #include <iostream>
 
 #ifdef WINDOWS
-// include the pthread_w32 header
+// include the pthread_w32 header ???
+#include <pthread.h>
 // do not forget to link the specific library
 #else
 #include <pthread.h>
@@ -145,6 +146,7 @@ void *thread_timer(void *a)
 	printf("Timer Thread number %ld\n", pthread_self());
 
 }
+#ifndef WINDOWS
 void setPthreadAffinity(const pthread_t thread)
 {
 	int s, j;
@@ -166,3 +168,4 @@ void setPthreadAffinity(const pthread_t thread)
 			printf("    CPU %d\n", j);
 
 }
+#endif

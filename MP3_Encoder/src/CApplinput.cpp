@@ -10,6 +10,7 @@
 #endif
 
 #include <sys/types.h>
+#include <stdio.h>
 #include <sys/stat.h>
 #include <iostream>
 #include <iterator>
