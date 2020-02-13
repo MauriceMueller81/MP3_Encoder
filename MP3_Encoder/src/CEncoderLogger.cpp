@@ -14,12 +14,12 @@
 namespace std {
 
 CEncoderLogger::CEncoderLogger() {
-	// TODO Auto-generated constructor stub
+
 
 }
 
 CEncoderLogger::~CEncoderLogger() {
-	// TODO Auto-generated destructor stub
+
 }
 
 void CEncoderLogger::EncoderLog(const char* msg, const char* fmt...)

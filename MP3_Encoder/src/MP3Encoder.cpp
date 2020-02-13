@@ -22,8 +22,6 @@ unsigned int optv;
 void *thread_encoder(void *path);
 pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 
-void *thread_timer(void *a);
-
 void setPthreadAffinity(const pthread_t thread);
 
 int main(int argc, char **argv) {
@@ -140,12 +138,7 @@ void *thread_encoder(void *path)
 	pthread_exit((void*)reVal);
 
 }
-void *thread_timer(void *a)
 
-{
-	printf("Timer Thread number %ld\n", pthread_self());
-
-}
 #ifndef WINDOWS
 void setPthreadAffinity(const pthread_t thread)
 {

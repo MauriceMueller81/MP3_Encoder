@@ -119,7 +119,7 @@ void CLameEncoder::showLameConfig()
 	// show only in Dubug mode:
 	if(optv > VL_LOW)
 	{
-		printf( "get number of samples: %d\n", lame_get_num_samples(psLame));
+		printf( "get number of samples: %lu\n", lame_get_num_samples(psLame));
 		printf( "current out sample rate: %d\n", lame_get_out_samplerate(psLame));
 		// show curent lame encoder configuration
 		printf( "current bitrate: %d\n", lame_get_brate(psLame));
@@ -150,9 +150,10 @@ bool CLameEncoder::encode( const string & filename )
 		return bResult;
 	}
 
-    if(optv > VL_NO)
+    if( optv > VL_NO)
+    {
     	printf("start encoding of %s\n", pcm.getWaveFileName().c_str() );
-
+    }
 	// create object of class COutputEncodedFile in automatic memory
 	COutputEncodedFile mp3(filename);
 
@@ -261,7 +262,6 @@ bool CLameEncoder::encode( const string & filename )
     			// if 24 or 32 bit are used
     			if(blockalign > 4)
     				writeResult = lame_encode_buffer_interleaved_int( psLame, reinterpret_cast<int*>( &pcm_buffer[0] ), NumOfSamplesPerChannel, mp3_buffer, MP3_SIZE );
-    			//	writeResult = lame_encode_buffer_interleaved( psLame, reinterpret_cast<short int*>( &pcm_buffer[0] ), NumOfSamplesPerChannel, mp3_buffer, MP3_SIZE );
     			else // for 16 bit and 8 bit
     				writeResult = lame_encode_buffer_interleaved( psLame, reinterpret_cast<short int*>( &pcm_buffer[0] ), NumOfSamplesPerChannel, mp3_buffer, MP3_SIZE );
 
